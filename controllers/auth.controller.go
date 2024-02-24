@@ -39,7 +39,7 @@ func SignUpUser(c *fiber.Ctx) error {
 	result := initializers.DB.Create(&newUser)
 
 	if result.Error != nil && strings.Contains(result.Error.Error(), "duplicate key value violates unique") {
-		return c.Status(fiber.StatusContinue).JSON(fiber.Map{"status": "fail", "message": "user with that email already exists"})
+		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"status": "fail", "message": "user with that email already exists"})
 	} else if result.Error != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"status": "error", "message": "something bad happened"})
 	}
@@ -59,7 +59,7 @@ func SignInUser(c *fiber.Ctx) error {
 	message := "Invalid email or password"
 
 	var user models.User
-	err := initializers.DB.First(&user, "email=?", strings.ToLower(payload.Email)).Error
+	err := initializers.DB.First(&user, "email = ?", strings.ToLower(payload.Email)).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"status": "fail", "message": message})
@@ -100,7 +100,6 @@ func SignInUser(c *fiber.Ctx) error {
 		MaxAge:   config.AccessTokenMaxAge * 60,
 		Secure:   false,
 		HTTPOnly: true,
-		Domain:   "localhost",
 	})
 	c.Cookie(&fiber.Cookie{
 		Name:     "refresh_token",
@@ -109,7 +108,6 @@ func SignInUser(c *fiber.Ctx) error {
 		MaxAge:   config.RefreshTokenMaxAge * 60,
 		Secure:   false,
 		HTTPOnly: true,
-		Domain:   "localhost",
 	})
 	c.Cookie(&fiber.Cookie{
 		Name:     "logged_in",
@@ -118,7 +116,6 @@ func SignInUser(c *fiber.Ctx) error {
 		MaxAge:   config.AccessTokenMaxAge * 60,
 		Secure:   false,
 		HTTPOnly: false,
-		Domain:   "localhost",
 	})
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "success", "access_token": accessTokenDetails.Token})
 }
@@ -166,7 +163,6 @@ func RefreshAccessToken(c *fiber.Ctx) error {
 		MaxAge:   config.AccessTokenMaxAge * 60,
 		Secure:   false,
 		HTTPOnly: true,
-		Domain:   "localhost",
 	})
 
 	c.Cookie(&fiber.Cookie{
@@ -176,7 +172,6 @@ func RefreshAccessToken(c *fiber.Ctx) error {
 		MaxAge:   config.AccessTokenMaxAge * 60,
 		Secure:   false,
 		HTTPOnly: false,
-		Domain:   "localhost",
 	})
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"status": "success", "access_token": accessTokenDetails.Token})
 }

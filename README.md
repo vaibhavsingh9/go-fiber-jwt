@@ -28,6 +28,11 @@ go run main.go
    b. A token is returned as response preferably JWT
 ```
     http://127.0.0.1:8000/api/auth/login/
+    
+    {
+        "name":"First",
+        "email":"first@gmail.com",
+    }
 ```
 3. Authorization of token
    a. Mechanism of sending token along with a request from client to service

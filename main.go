@@ -1,13 +1,26 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/redis/go-redis/v9"
 	"github.com/vaibhavsingh9/go-fiber-jwt/controllers"
+	"github.com/vaibhavsingh9/go-fiber-jwt/initializers"
 	"github.com/vaibhavsingh9/go-fiber-jwt/middleware"
+	"golang.org/x/net/context"
 	"log"
 )
+
+func init() {
+	config, err := initializers.LoadConfig(".")
+	if err != nil {
+		log.Fatalln("Failed to load environment variables! \n", err.Error())
+	}
+	initializers.ConnectDB(&config)
+	initializers.ConnectRedis(&config)
+}
 
 func main() {
 	app := fiber.New()
@@ -29,10 +42,29 @@ func main() {
 		router.Get("/logout", middleware.DeserializeUser, controllers.LogoutUser)
 	})
 
-	micro.Get("/api/healthchecker", func(c *fiber.Ctx) error {
+	micro.Get("/users/me", middleware.DeserializeUser, controllers.GetMe)
+
+	ctx := context.Background()
+	value, err := initializers.RedisClient.Get(ctx, "test").Result()
+
+	if err == redis.Nil {
+		fmt.Println("key: test does not exist")
+	} else if err != nil {
+		panic(err)
+	}
+
+	micro.Get("/healthchecker", func(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusOK).JSON(fiber.Map{
 			"status":  "success",
-			"message": "How to refresh access token the right way",
+			"message": value,
+		})
+	})
+
+	micro.All("*", func(c *fiber.Ctx) error {
+		path := c.Path()
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"status":  "fail",
+			"message": fmt.Sprintf("Path: %v does not exists on this server", path),
 		})
 	})
 

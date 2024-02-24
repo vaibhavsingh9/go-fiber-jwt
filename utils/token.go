@@ -25,14 +25,16 @@ func CreateToken(userid string, ttl time.Duration, privateKey string) (*TokenDet
 	td.TokenUuid = uuid.NewV4().String()
 	td.UserID = userid
 
-	decodePrivateKey, err := base64.StdEncoding.DecodeString(privateKey)
+	decodedPrivateKey, err := base64.StdEncoding.DecodeString(privateKey)
 	if err != nil {
 		return nil, fmt.Errorf("could not decode token private key: %w", err)
 	}
-	key, err := jwt.ParseRSAPrivateKeyFromPEM(decodePrivateKey)
+	key, err := jwt.ParseRSAPrivateKeyFromPEM(decodedPrivateKey)
+
 	if err != nil {
-		return nil, fmt.Errorf("Create: parse token private key: %w", err)
+		return nil, fmt.Errorf("create: parse token private key: %w", err)
 	}
+
 	atClaims := make(jwt.MapClaims)
 	atClaims["sub"] = userid
 	atClaims["token_uuid"] = td.TokenUuid
@@ -44,32 +46,38 @@ func CreateToken(userid string, ttl time.Duration, privateKey string) (*TokenDet
 	if err != nil {
 		return nil, fmt.Errorf("create: sign token: %w", err)
 	}
+
 	return td, nil
 }
 
 func ValidateToken(token string, publicKey string) (*TokenDetails, error) {
-	decodePublicKey, err := base64.StdEncoding.DecodeString(publicKey)
+	decodedPublicKey, err := base64.StdEncoding.DecodeString(publicKey)
 	if err != nil {
-		return nil, fmt.Errorf("could not decode key: %w", err)
+		return nil, fmt.Errorf("could not decode: %w", err)
 	}
-	key, err := jwt.ParseRSAPrivateKeyFromPEM(decodePublicKey)
+
+	key, err := jwt.ParseRSAPublicKeyFromPEM(decodedPublicKey)
 
 	if err != nil {
 		return nil, fmt.Errorf("validate: parse key: %w", err)
 	}
+
 	parsedToken, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, fmt.Errorf("unexpected method: %s", t.Header["alg"])
 		}
 		return key, nil
 	})
+
 	if err != nil {
 		return nil, fmt.Errorf("validate: %w", err)
 	}
+
 	claims, ok := parsedToken.Claims.(jwt.MapClaims)
 	if !ok || !parsedToken.Valid {
 		return nil, fmt.Errorf("validate: invalid token")
 	}
+
 	return &TokenDetails{
 		TokenUuid: fmt.Sprint(claims["token_uuid"]),
 		UserID:    fmt.Sprint(claims["sub"]),

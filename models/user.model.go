@@ -13,7 +13,7 @@ type User struct {
 	Password  string     `gorm:"type:varchar(100);not null"`
 	Role      *string    `gorm:"type:varchar(50);default:'user';not null"`
 	Provider  *string    `gorm:"type:varchar(50);default:'local';not null"`
-	Verified  *bool      `gorm:"not null; default:false'"`
+	Verified  *bool      `gorm:"not null; default:false"`
 	CreatedAt *time.Time `gorm:"not null; default:now()"`
 	UpdatedAt *time.Time `gorm:"not null;default:now()"`
 }
@@ -28,7 +28,7 @@ type SignUpInput struct {
 
 // SignInInput to validate incoming data during the sign-in process
 type SignInInput struct {
-	Email    string `json:"name" validate:"required"`
+	Email    string `json:"email" validate:"required"`
 	Password string `json:"password" validate:"required"`
 }
 
@@ -76,8 +76,6 @@ func ValidateStruct[T any](payload T) []*ErrorResponse {
 			element.Value = err.Param()
 			errors = append(errors, &element)
 		}
-	} else {
-		return nil //no errors, return nil
 	}
 	return errors
 }
