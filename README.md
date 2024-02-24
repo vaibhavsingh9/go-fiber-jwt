@@ -34,20 +34,20 @@ go run main.go
         "email":"first@gmail.com",
     }
 ```
-3. Authorization of token
-   a. Mechanism of sending token along with a request from client to service
-         -> Tokens sent as cookies
-   b. Should check for expiry
-         -> Validate function in [token.go](https://github.com/vaibhavsingh9/go-fiber-jwt/blob/main/utils/token.go)
-   c. Error handling (proper error codes in each failure scenario)
-4. 
-4. Revocation of token
-   a. Mechanism of revoking a token from backend
-         -> Unable to implement
+3. Authorization of token <br />
+   a. Mechanism of sending token along with a request from client to service <br />
+         -> Tokens sent as cookies <br />
+   b. Should check for expiry <br />
+         -> Validate function in [token.go](https://github.com/vaibhavsingh9/go-fiber-jwt/blob/main/utils/token.go) <br />
+   c. Error handling (proper error codes in each failure scenario) <br />
 
-5. Mechanism to refresh a token
-   a. Client should be able to renew the token before it expires
-         -> Implemented
+4. Revocation of token <br />
+   a. Mechanism of revoking a token from backend <br />
+         -> Unable to implement <br />
+ 
+5. Mechanism to refresh a token <br />
+   a. Client should be able to renew the token before it expires <br />
+         -> Implemented <br />
 
 Used frameworks and libraries:
    1. [Fiber](https://docs.gofiber.io/)
