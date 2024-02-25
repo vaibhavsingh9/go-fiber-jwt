@@ -15,17 +15,19 @@ type TokenDetails struct {
 	ExpiresIn *int64
 }
 
+// uses RSA encryption for creating token
+// public key and private key concept
 func CreateToken(userid string, ttl time.Duration, privateKey string) (*TokenDetails, error) {
 	now := time.Now().UTC()
 	td := &TokenDetails{
 		ExpiresIn: new(int64),
 		Token:     new(string),
 	}
-	*td.ExpiresIn = now.Add(ttl).Unix()
-	td.TokenUuid = uuid.NewV4().String()
+	*td.ExpiresIn = now.Add(ttl).Unix()  //adding the additional time coming from ttl which is ACCESS_TOKEN_EXPIRED_IN=15m
+	td.TokenUuid = uuid.NewV4().String() //UUID is set
 	td.UserID = userid
 
-	decodedPrivateKey, err := base64.StdEncoding.DecodeString(privateKey)
+	decodedPrivateKey, err := base64.StdEncoding.DecodeString(privateKey) //byte string of the key in app.env stored in base64 format
 	if err != nil {
 		return nil, fmt.Errorf("could not decode token private key: %w", err)
 	}
@@ -35,13 +37,15 @@ func CreateToken(userid string, ttl time.Duration, privateKey string) (*TokenDet
 		return nil, fmt.Errorf("create: parse token private key: %w", err)
 	}
 
-	atClaims := make(jwt.MapClaims)
+	atClaims := make(jwt.MapClaims) // Claims are statements about an entity (typically, the user) and additional data.
 	atClaims["sub"] = userid
 	atClaims["token_uuid"] = td.TokenUuid
 	atClaims["exp"] = td.ExpiresIn
 	atClaims["iat"] = now.Unix()
 	atClaims["nbf"] = now.Unix()
 
+	//using the claims map jwt is signed with the RS 256 bit algorithm
+	//signing is done with the help of RSA private key decoded above.
 	*td.Token, err = jwt.NewWithClaims(jwt.SigningMethodRS256, atClaims).SignedString(key)
 	if err != nil {
 		return nil, fmt.Errorf("create: sign token: %w", err)
