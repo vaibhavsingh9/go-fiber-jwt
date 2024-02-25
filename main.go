@@ -27,6 +27,7 @@ func main() {
 	micro := fiber.New()
 
 	app.Mount("/api", micro)
+	//middleware for handling logging and CORS(Cross origin resource sharing)
 	app.Use(logger.New())
 	app.Use(cors.New(cors.Config{
 		AllowOrigins:     "http://localhost:3000",

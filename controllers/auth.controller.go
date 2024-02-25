@@ -15,7 +15,7 @@ import (
 
 func SignUpUser(c *fiber.Ctx) error {
 	var payload *models.SignUpInput
-	if err := c.BodyParser(&payload); err != nil {
+	if err := c.BodyParser(&payload); err != nil { //binding the struct with the header value
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"status": "fail", "message": err.Error()})
 	}
 	errors := models.ValidateStruct(payload)
@@ -30,14 +30,14 @@ func SignUpUser(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"status": "fail", "message": err.Error()})
 	}
-
+	//user is created from all the fields above
 	newUser := models.User{
 		Name:     payload.Name,
 		Email:    strings.ToLower(payload.Email),
 		Password: string(hashedPassword),
 	}
-	result := initializers.DB.Create(&newUser)
-
+	result := initializers.DB.Create(&newUser) //a new insert statement is run in postgres DB with reference of newUser
+	//GORM error handling
 	if result.Error != nil && strings.Contains(result.Error.Error(), "duplicate key value violates unique") {
 		return c.Status(fiber.StatusConflict).JSON(fiber.Map{"status": "fail", "message": "user with that email already exists"})
 	} else if result.Error != nil {
@@ -58,8 +58,8 @@ func SignInUser(c *fiber.Ctx) error {
 	}
 	message := "Invalid email or password"
 
-	var user models.User
-	err := initializers.DB.First(&user, "email = ?", strings.ToLower(payload.Email)).Error
+	var user models.User                                                                   //using the user struct
+	err := initializers.DB.First(&user, "email = ?", strings.ToLower(payload.Email)).Error //throws the query // SELECT * FROM user ORDER BY id LIMIT 1;
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"status": "fail", "message": message})
