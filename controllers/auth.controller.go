@@ -43,6 +43,8 @@ func SignUpUser(c *fiber.Ctx) error {
 	} else if result.Error != nil {
 		return c.Status(fiber.StatusBadGateway).JSON(fiber.Map{"status": "error", "message": "something bad happened"})
 	}
+	//new user created with the filtered record function help
+	//so that all the sensitive data fields are not visible.
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"status": "success", "data": fiber.Map{"user": models.FilterUserRecord(&newUser)}})
 }
 
@@ -134,6 +136,7 @@ func RefreshAccessToken(c *fiber.Ctx) error {
 	if err != nil {
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"status": "fail", "message": err.Error()})
 	}
+
 	userid, err := initializers.RedisClient.Get(ctx, tokenClaims.TokenUuid).Result()
 	if err == redis.Nil {
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"status": "fail", "message": message})

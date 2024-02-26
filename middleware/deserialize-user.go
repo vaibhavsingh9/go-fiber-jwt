@@ -39,7 +39,8 @@ func DeserializeUser(c *fiber.Ctx) error {
 	if err == gorm.ErrRecordNotFound {
 		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"status": "fail", "message": "the user belonging to this token no logger exists"})
 	}
-
+	//user and access_token_uuid are stored in fiber context which can
+	//be used throughout the api, it will be used for logout route as well.
 	c.Locals("user", models.FilterUserRecord(&user))
 	c.Locals("access_token_uuid", tokenClaims.TokenUuid)
 

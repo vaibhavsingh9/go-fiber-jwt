@@ -54,8 +54,9 @@ func CreateToken(userid string, ttl time.Duration, privateKey string) (*TokenDet
 	return td, nil
 }
 
+// ValidateToken example from docs jo-jwt
 func ValidateToken(token string, publicKey string) (*TokenDetails, error) {
-	decodedPublicKey, err := base64.StdEncoding.DecodeString(publicKey)
+	decodedPublicKey, err := base64.StdEncoding.DecodeString(publicKey) //token string
 	if err != nil {
 		return nil, fmt.Errorf("could not decode: %w", err)
 	}
