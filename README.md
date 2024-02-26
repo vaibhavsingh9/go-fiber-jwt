@@ -23,8 +23,8 @@ go run main.go
    ```
 
  
-2. Sign in
-   a. Authentication of user credentials
+2. Sign in<br />
+   a. Authentication of user credentials<br />
    b. A token is returned as response preferably JWT
 ```
     http://127.0.0.1:8000/api/auth/login/
