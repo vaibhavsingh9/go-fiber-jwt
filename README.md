@@ -43,7 +43,7 @@ go run main.go
 
 4. Revocation of token <br />
    a. Mechanism of revoking a token from backend <br />
-         -> Unable to implement <br />
+         -> Implemented in logout route, through Redis DEL function, the token will be deleted<br />
  
 5. Mechanism to refresh a token <br />
    a. Client should be able to renew the token before it expires <br />
