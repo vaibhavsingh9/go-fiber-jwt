@@ -17,6 +17,7 @@ func ConnectRedis(config *Config) {
 	RedisClient = redis.NewClient(&redis.Options{
 		Addr: config.RedisUri,
 	})
+	//sending a ping command in Redis terminal to check whether connection is alive or not
 	if _, err := RedisClient.Ping(ctx).Result(); err != nil {
 		panic(err)
 	}
