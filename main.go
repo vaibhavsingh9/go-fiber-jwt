@@ -46,7 +46,7 @@ func main() {
 	micro.Get("/users/me", middleware.DeserializeUser, controllers.GetMe)
 
 	ctx := context.Background()
-	value, err := initializers.RedisClient.Get(ctx, "test").Result()
+	value, err := initializers.RedisClient.Get(ctx, "test (key)").Result()
 
 	if err == redis.Nil {
 		fmt.Println("key: test does not exist")
