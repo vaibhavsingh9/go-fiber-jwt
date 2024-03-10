@@ -5,6 +5,9 @@ import (
 	"time"
 )
 
+/*By using mapstructure, you can easily map configuration data stored in maps to corresponding
+struct fields with minimal code, making your code cleaner and more maintainable.*/
+
 type Config struct {
 	DBHost         string `mapstructure:"POSTGRES_HOST"`
 	DBUserName     string `mapstructure:"POSTGRES_USER"`
