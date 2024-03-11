@@ -20,17 +20,19 @@ type TokenDetails struct {
 func CreateToken(userid string, ttl time.Duration, privateKey string) (*TokenDetails, error) {
 	now := time.Now().UTC()
 	td := &TokenDetails{
-		ExpiresIn: new(int64),
-		Token:     new(string),
+		ExpiresIn: new(int64),  //memory allocated using new()
+		Token:     new(string), //memory allocated for the Token value
 	}
 	*td.ExpiresIn = now.Add(ttl).Unix()  //adding the additional time coming from ttl which is ACCESS_TOKEN_EXPIRED_IN=15m
 	td.TokenUuid = uuid.NewV4().String() //UUID is set
 	td.UserID = userid
-
-	decodedPrivateKey, err := base64.StdEncoding.DecodeString(privateKey) //byte string of the key in app.env stored in base64 format
+	//base64 encoded string gets converted to normal string so that signing of jwt can take place
+	decodedPrivateKey, err := base64.StdEncoding.DecodeString(privateKey)
 	if err != nil {
 		return nil, fmt.Errorf("could not decode token private key: %w", err)
 	}
+	//PEM is a base-64 encoding mechanism of a DER certificate. PEM can also encode other kinds of data,
+	//such as public/private keys and certificate requests.
 	key, err := jwt.ParseRSAPrivateKeyFromPEM(decodedPrivateKey)
 
 	if err != nil {
