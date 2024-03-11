@@ -16,7 +16,7 @@ type TokenDetails struct {
 }
 
 // uses RSA encryption for creating token
-// public key and private key concept
+// public key(authenticate) and private key(access and refresh token) concept
 func CreateToken(userid string, ttl time.Duration, privateKey string) (*TokenDetails, error) {
 	now := time.Now().UTC()
 	td := &TokenDetails{
