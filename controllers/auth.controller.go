@@ -60,8 +60,10 @@ func SignInUser(c *fiber.Ctx) error {
 	}
 	message := "Invalid email or password"
 
-	var user models.User                                                                   //using the user struct
-	err := initializers.DB.First(&user, "email = ?", strings.ToLower(payload.Email)).Error //throws the query // SELECT * FROM user ORDER BY id LIMIT 1;
+	var user models.User
+	//using the user struct
+	//throws the query // SELECT * FROM user ORDER BY id LIMIT 1;
+	err := initializers.DB.First(&user, "email = ?", strings.ToLower(payload.Email)).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"status": "fail", "message": message})
