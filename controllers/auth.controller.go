@@ -77,12 +77,12 @@ func SignInUser(c *fiber.Ctx) error {
 	}
 
 	config, _ := initializers.LoadConfig(".") //accessing environment variables
-
+	//access token created with parameters from .env file
 	accessTokenDetails, err := utils.CreateToken(user.ID.String(), config.AccessTokenExpiresIn, config.AccessTokenPrivateKey)
 	if err != nil {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{"status": "fail", "message": err.Error()})
 	}
-
+	//refresh token created with parameters from .env file
 	refreshTokenDetails, err := utils.CreateToken(user.ID.String(), config.RefreshTokenExpiresIn, config.RefreshTokenPrivateKey)
 	if err != nil {
 		return c.Status(fiber.StatusUnprocessableEntity).JSON(fiber.Map{"status": "fail", "message": err.Error()})
